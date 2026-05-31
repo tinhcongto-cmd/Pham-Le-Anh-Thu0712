@@ -4,84 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quà 1/6 Cho Em Bé Phạm Lê Anh Thư 💖</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Nhúng các font chữ phong cách điện ảnh lãng mạn -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
-            background-color: #050014;
+            background-color: #03000a;
             overflow: hidden;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            perspective: 1000px;
+            perspective: 1200px; /* Tăng độ sâu không gian 3D */
             font-family: 'Quicksand', sans-serif;
         }
 
-        /* Bầu trời sao */
-        .stars {
+        /* Canvas hạt bụi sao lấp lánh (Nền chính của cả ứng dụng) */
+        #particleCanvas {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(29,0,46,1) 0%, rgba(5,0,20,1) 100%);
             z-index: 1;
-        }
-        .star {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            animation: blink 2s infinite ease-in-out;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; box-shadow: 0 0 5px #fff; }
+            pointer-events: none;
         }
 
-        /* Màn hình chờ mở quà */
+        /* Dải sương mù ngân hà chuyển màu chậm rãi phía sau */
+        .nebula-cloud {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 128, 0.08) 0%, rgba(120, 0, 255, 0.05) 50%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            animation: nebulaDrift 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes nebulaDrift {
+            0% { transform: translate(-10%, -10%) scale(1); }
+            100% { transform: translate(10%, 10%) scale(1.2); }
+        }
+
+        /* ----------------------------------------------------
+           1. MÀN HÌNH KHỞI ĐẦU: TRÁI TIM ĐẬP NEON
+           ---------------------------------------------------- */
         #start-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #050014;
+            background: rgba(3, 0, 10, 0.9);
             z-index: 999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
-            transition: opacity 1s ease;
+            transition: opacity 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            overflow: hidden;
         }
-        
+
         #start-screen h1 {
             font-family: 'Dancing Script', cursive;
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            color: #ffb3d9;
-            text-shadow: 0 0 15px #ff1a8c;
+            font-size: 3rem;
+            margin-bottom: 50px;
+            color: #ffccd5;
+            text-shadow: 0 0 20px rgba(255, 26, 140, 0.8);
             text-align: center;
+            padding: 0 20px;
+            animation: textGlowPulse 3s infinite alternate;
         }
 
-        .btn-start {
-            background: linear-gradient(45deg, #ff1a8c, #9900ff);
-            border: none;
-            padding: 15px 40px;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 50px;
+        @keyframes textGlowPulse {
+            0% { text-shadow: 0 0 15px rgba(255, 26, 140, 0.6); }
+            100% { text-shadow: 0 0 35px rgba(255, 26, 140, 1), 0 0 10px #fff; }
+        }
+
+        /* Trái tim hồng đập nhịp nhàng */
+        .heart-wrapper {
+            position: relative;
+            width: 140px;
+            height: 140px;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 26, 140, 0.6);
-            transition: transform 0.3s;
-        }
-        .btn-start:hover {
-            transform: scale(1.1);
+            z-index: 10;
         }
 
-        /* Không gian quả cầu 3D */
+        .beating-heart {
+            width: 100%;
+            height: 100%;
+            fill: #ff2a85;
+            filter: drop-shadow(0 0 15px #ff1a8c) drop-shadow(0 0 30px #9900ff);
+            animation: heartBeat 1.2s infinite cubic-bezier(0.215, 0.610, 0.355, 1);
+            transform-origin: center;
+            transition: transform 0.2s ease;
+        }
+
+        .heart-wrapper:hover .beating-heart {
+            fill: #ff529a;
+            filter: drop-shadow(0 0 25px #ff1a8c) drop-shadow(0 0 45px #ffb3d9);
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.22); }
+            30% { transform: scale(1.05); }
+            45% { transform: scale(1.25); }
+            70% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
+        /* ----------------------------------------------------
+           2. KHÔNG GIAN 3D & ẢNH LỘNG LẪY (SPHERE PHOTO)
+           ---------------------------------------------------- */
         .scene {
             position: relative;
             width: 100vw;
@@ -90,192 +133,617 @@
             justify-content: center;
             align-items: center;
             z-index: 2;
+            pointer-events: none; /* Chỉ cho phép chạm khi quả cầu xuất hiện */
+        }
+
+        .scene.interactive {
+            pointer-events: auto;
         }
 
         .sphere-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 350px;
+            height: 350px;
             transform-style: preserve-3d;
             transition: transform 1s ease;
         }
 
+        /* Kích thước hình ảnh to tròn, viền LED hồng neon sắc nét */
         .photo-item {
             position: absolute;
-            width: 90px;
-            height: 120px;
+            width: 130px; 
+            height: 173px; 
             object-fit: cover;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(255, 26, 140, 0.8), 0 0 30px rgba(153, 0, 255, 0.5);
-            transition: all 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+            border-radius: 16px; 
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 20px rgba(255, 26, 140, 0.9), 0 0 40px rgba(153, 0, 255, 0.5);
+            opacity: 0;
+            transform: translate3d(0, 0, 0) scale(0);
+            transition: opacity 2s, transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
             backface-visibility: visible;
+            cursor: grab;
+            touch-action: none;
         }
 
-        /* Tên nhân vật chính hiển thị sau khi gom quả cầu */
+        .photo-item:active {
+            cursor: grabbing;
+        }
+
+        /* ----------------------------------------------------
+           3. THỜI KHẮC CUỐI & HỘP THƯ TAY (GLASSMORPHISM)
+           ---------------------------------------------------- */
         #main-name {
             position: absolute;
-            bottom: 20%;
+            bottom: 22%;
             font-family: 'Dancing Script', cursive;
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: #fff;
-            text-shadow: 0 0 10px #ff1a8c, 0 0 20px #9900ff;
+            text-shadow: 0 0 20px #ff1a8c, 0 0 40px #9900ff;
             opacity: 0;
             transition: opacity 2s ease;
             z-index: 10;
             text-align: center;
             width: 100%;
+            pointer-events: none;
         }
 
-        /* Nút mở thư */
         #btn-open-letter {
             position: absolute;
-            bottom: 10%;
+            bottom: 11%;
             left: 50%;
             transform: translateX(-50%);
-            background: transparent;
+            background: linear-gradient(45deg, rgba(255, 26, 140, 0.3), rgba(153, 0, 255, 0.3));
             border: 2px solid #ffb3d9;
             color: #ffb3d9;
-            padding: 10px 30px;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-size: 1.15rem;
+            font-weight: 700;
             cursor: pointer;
             opacity: 0;
-            transition: opacity 2s ease, background 0.3s;
+            transition: all 0.5s ease;
             z-index: 10;
+            box-shadow: 0 0 15px rgba(255, 26, 140, 0.3);
         }
+        
         #btn-open-letter:hover {
             background: #ffb3d9;
-            color: #050014;
-            box-shadow: 0 0 15px #ffb3d9;
+            color: #03000a;
+            box-shadow: 0 0 30px #ffb3d9;
+            transform: translateX(-50%) scale(1.05);
         }
 
-        /* Hộp thư nội dung */
+        /* Hộp thư kính mờ cao cấp */
         #letter-modal {
             position: fixed;
             top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            transform: translate(-50%, -50%) scale(0.85);
+            background: rgba(15, 5, 25, 0.88);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 40px 30px;
-            border-radius: 20px;
+            padding: 45px 35px;
+            border-radius: 25px;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             text-align: center;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.5s ease;
-            box-shadow: 0 0 30px rgba(255, 26, 140, 0.4);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 50px rgba(255, 26, 140, 0.5);
             color: #fff;
         }
+        
         #letter-modal.show {
             opacity: 1;
             visibility: visible;
             transform: translate(-50%, -50%) scale(1);
         }
 
+        /* Vùng nội dung chữ gõ máy tính */
         .letter-content {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            text-align: justify;
+            text-justify: inter-word;
+            min-height: 180px;
+        }
+
+        /* Con trỏ soạn thảo đang nhấp nháy */
+        .typewriter-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.3rem;
+            background-color: #ff1a8c;
+            margin-left: 3px;
+            vertical-align: middle;
+            animation: cursorBlink 0.8s infinite alternate;
+        }
+
+        @keyframes cursorBlink {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
         
         .close-btn {
             background: none;
             border: none;
             color: #ffb3d9;
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: underline;
+            transition: color 0.3s;
+        }
+        .close-btn:hover {
+            color: #ff1a8c;
         }
 
+        /* ----------------------------------------------------
+           4. HỖ TRỢ THIẾT BỊ DI ĐỘNG (MOBILE RESPONSIVE)
+           ---------------------------------------------------- */
+        @media (max-width: 600px) {
+            .photo-item {
+                width: 100px; 
+                height: 133px; 
+            }
+            .sphere-container {
+                width: 250px;
+                height: 250px;
+            }
+            #start-screen h1 {
+                font-size: 2.3rem;
+            }
+            .heart-wrapper {
+                width: 110px;
+                height: 110px;
+            }
+            #main-name {
+                font-size: 2.8rem;
+                bottom: 24%;
+            }
+            #btn-open-letter {
+                font-size: 1.05rem;
+                padding: 12px 30px;
+                bottom: 13%;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Audio - Đổi tên file nhạc tại đây -->
+    <!-- Nhạc nền chất lượng cao -->
     <audio id="bgMusic" src="nhac.mp3" loop></audio>
 
-    <!-- Màn hình chào -->
+    <!-- Hộp sương mù ngân hà đổi màu ở nền sâu -->
+    <div class="nebula-cloud"></div>
+
+    <!-- Canvas chính vẽ hiệu ứng hạt sao hồng tụ thành chữ -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- MÀN HÌNH KHỞI ĐỘNG: TRÁI TIM ĐẬP NHỊP SANG TRỌNG -->
     <div id="start-screen">
-        <h1>Gửi em bé của anh... ✨</h1>
-        <button class="btn-start" onclick="startMagic()">Nhấn vào đây để nhận quà 1/6 nhé</button>
+        <h1>Quà Quốc Tế Thiếu Nhi ✨</h1>
+        <div class="heart-wrapper" id="heartTrigger" onclick="shatterHeartAndStart(event)">
+            <svg class="beating-heart" viewBox="0 0 32 29.6">
+                <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+                c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+            </svg>
+        </div>
+        <p style="margin-top: 30px; color: #ffb3d9; font-style: italic; letter-spacing: 1px; font-size: 1rem; text-shadow: 0 0 10px #ff2a85;">Chạm vào trái tim hồng để mở quà...</p>
     </div>
 
-    <!-- Nền sao -->
-    <div class="stars" id="starsContainer"></div>
-
-    <!-- Quả cầu ảnh 3D -->
-    <div class="scene">
+    <!-- Không gian chứa quả cầu 3D tương tác -->
+    <div class="scene" id="mainScene">
         <div class="sphere-container" id="sphere">
-            <!-- 15 Ảnh (Cậu thay tên file anh1.jpg -> anh15.jpg tương ứng nhé) -->
-            <img src="anh1.jpg" class="photo-item" alt="anh">
-            <img src="anh2.jpg" class="photo-item" alt="anh">
-            <img src="anh3.jpg" class="photo-item" alt="anh">
-            <img src="anh4.jpg" class="photo-item" alt="anh">
-            <img src="anh5.jpg" class="photo-item" alt="anh">
-            <img src="anh6.jpg" class="photo-item" alt="anh">
-            <img src="anh7.jpg" class="photo-item" alt="anh">
-            <img src="anh8.jpg" class="photo-item" alt="anh">
-            <img src="anh9.jpg" class="photo-item" alt="anh">
-            <img src="anh10.jpg" class="photo-item" alt="anh">
-            <img src="anh11.jpg" class="photo-item" alt="anh">
-            <img src="anh12.jpg" class="photo-item" alt="anh">
-            <img src="anh13.jpg" class="photo-item" alt="anh">
-            <img src="anh14.jpg" class="photo-item" alt="anh">
-            <img src="anh15.jpg" class="photo-item" alt="anh">
+            <!-- 15 bức ảnh sẵn sàng cho sự kiện chuyển động -->
+            <img src="anh1.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Anh+Thư'">
+            <img src="anh2.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Xinh+Đẹp'">
+            <img src="anh3.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Em+Bé'">
+            <img src="anh4.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Xinh+Ngoan'">
+            <img src="anh5.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Dễ+Thương'">
+            <img src="anh6.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Cute'">
+            <img src="anh7.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Princess'">
+            <img src="anh8.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Love+U'">
+            <img src="anh9.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Angel'">
+            <img src="anh10.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=My+Girl'">
+            <img src="anh11.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Anh+Thư+💖'">
+            <img src="anh12.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Quả+Cầu+3D'">
+            <img src="anh13.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Thiếu+Nhi'">
+            <img src="anh14.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Ngọt+Ngào'">
+            <img src="anh15.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Mãi+Yêu'">
         </div>
     </div>
 
-    <!-- Chữ và Nút hiển thị sau -->
+    <!-- Tên chủ nhân và nút kích hoạt xem thư tay -->
     <div id="main-name">Phạm Lê Anh Thư 💖</div>
-    <button id="btn-open-letter" onclick="toggleLetter(true)">Đọc thư của anh nhé 💌</button>
+    <button id="btn-open-letter" onclick="toggleLetter(true)">Mở lá thư của anh 💌</button>
 
-    <!-- Thư tay -->
+    <!-- Hộp thoại thư tình mờ ảo -->
     <div id="letter-modal">
-        <div class="letter-content">
-            Hôm nay 01-06-2025 Là ngày "Quốc tế thiếu nhi". <br><br>
-            Embee bé nhỏ của anh, anh chúc embee có một ngày vui vẻ, hạnh phúc và mãi là embee của anh, chúc cho đôi mình bên nhau thật bền lâu.<br><br>
-            Happy to you 1 day vui vẻ ạ ❤️<br>
-            <i style="font-size: 0.9rem; color: #ccc;">(lâu rồi không làm mong em tạm chấp nhận nhé ^^)</i>
-        </div>
-        <button class="close-btn" onclick="toggleLetter(false)">Đóng thư</button>
+        <div class="letter-content" id="letterText"></div>
+        <button class="close-btn" onclick="toggleLetter(false)">Đóng lá thư</button>
     </div>
 
     <script>
-        // Bầu trời sao ngẫu nhiên
-        const starsContainer = document.getElementById('starsContainer');
-        for (let i = 0; i < 120; i++) {
-            const star = document.createElement('div');
-            star.classList.add('star');
-            star.style.width = Math.random() * 3 + 'px';
-            star.style.height = star.style.width;
-            star.style.left = Math.random() * 100 + 'vw';
-            star.style.top = Math.random() * 100 + 'vh';
-            star.style.animationDelay = Math.random() * 2 + 's';
-            starsContainer.appendChild(star);
+        // ----------------------------------------------------
+        // HỆ THỐNG ENGINE HẠT BỤI SAO HỘI TỤ (TEXT PARTICLES ENGINE)
+        // ----------------------------------------------------
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Khởi tạo Canvas ẩn để trích xuất tọa độ điểm của chữ
+        const textCanvas = document.createElement('canvas');
+        const textCtx = textCanvas.getContext('2d', { willReadFrequently: true });
+
+        let particles = [];
+        const maxParticles = 2800; // Đống bụi sao cực dày đặc tương tự như bức hình
+        let currentPhase = 'AMBIENT'; // AMBIENT, SCATTER, TEXT1, TEXT2, TEXT3, SPHERE_FLOW
+        let animationFrameId = null;
+
+        // Bảng màu hồng, tím neon cực sang xịn lấp lánh giống video
+        const cosmicColors = [
+            'rgba(255, 26, 140, 0.95)',  // Hồng neon đậm
+            'rgba(255, 128, 191, 0.9)',  // Hồng phấn nhạt rực rỡ
+            'rgba(180, 51, 255, 0.95)',  // Tím rực rỡ
+            'rgba(255, 255, 255, 0.95)', // Hạt sao trắng sáng lấp lánh
+            'rgba(255, 77, 166, 0.9)'    // Hồng tươi
+        ];
+
+        // Lớp hạt vũ trụ
+        class Particle {
+            constructor() {
+                this.reset(true);
+            }
+
+            reset(initAll = false) {
+                if (initAll) {
+                    this.x = Math.random() * window.innerWidth;
+                    this.y = Math.random() * window.innerHeight;
+                } else {
+                    // Xuất hiện từ viền hoặc trung tâm tùy ý thích
+                    this.x = window.innerWidth / 2;
+                    this.y = window.innerHeight / 2;
+                }
+                this.vx = (Math.random() - 0.5) * 3;
+                this.vy = (Math.random() - 0.5) * 3;
+                this.size = Math.random() * 2 + 0.8; // Kích cỡ hạt cát sao nhỏ rực rỡ
+                this.baseSize = this.size;
+                this.color = cosmicColors[Math.floor(Math.random() * cosmicColors.length)];
+                
+                // Thuộc tính phục vụ tụ chữ
+                this.tx = null; // Target X
+                this.ty = null; // Target Y
+                this.hasTarget = false;
+                this.ease = Math.random() * 0.05 + 0.04; // Tốc độ tụ chữ ngẫu nhiên tạo độ mượt
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = Math.random() * 0.5 + 0.2;
+                
+                // Hiệu ứng lấp lánh
+                this.alpha = Math.random() * 0.5 + 0.5;
+                this.alphaSpeed = Math.random() * 0.02 + 0.01;
+            }
+
+            update() {
+                // Hiệu ứng lấp lánh nhấp nháy nhè nhẹ
+                this.alpha += this.alphaSpeed;
+                if (this.alpha > 1 || this.alpha < 0.3) {
+                    this.alphaSpeed = -this.alphaSpeed;
+                }
+
+                if (currentPhase === 'AMBIENT') {
+                    // Trôi nổi tự nhiên, xoáy lờ đờ hướng về trung tâm (tạo hào quang cho trái tim)
+                    let dx = window.innerWidth / 2 - this.x;
+                    let dy = window.innerHeight / 2 - this.y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist > 10) {
+                        this.vx += (dx / dist) * 0.02;
+                        this.vy += (dy / dist) * 0.02;
+                    }
+                    this.vx += Math.sin(this.angle) * 0.05;
+                    this.vy += Math.cos(this.angle) * 0.05;
+                    this.angle += 0.01;
+
+                    // Giới hạn tốc độ
+                    this.vx *= 0.98;
+                    this.vy *= 0.98;
+
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Giới hạn màn hình
+                    if (this.x < 0 || this.x > window.innerWidth || this.y < 0 || this.y > window.innerHeight) {
+                        this.reset(true);
+                    }
+                } 
+                else if (currentPhase === 'SCATTER') {
+                    // Bay tỏa lực nổ cực nhanh
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.vx *= 0.97;
+                    this.vy *= 0.97;
+                } 
+                else if (this.hasTarget) {
+                    // Hiệu ứng tụ chữ mượt mà cực kỳ nghệ thuật
+                    let dx = this.tx - this.x;
+                    let dy = this.ty - this.y;
+                    
+                    // Bay tụ vào điểm mục tiêu bằng thuật toán hấp dẫn
+                    this.x += dx * this.ease;
+                    this.y += dy * this.ease;
+                    
+                    // Thêm chút xao động gió thổi nhẹ cho chữ tựa như dải cát động
+                    this.x += Math.sin(this.angle) * 0.25;
+                    this.y += Math.cos(this.angle) * 0.25;
+                    this.angle += 0.05;
+                    
+                    this.size = this.baseSize * (1 + (Math.sin(this.angle) * 0.3));
+                } 
+                else {
+                    // Những hạt dư thừa không có mục tiêu chữ sẽ lững lờ trôi làm background
+                    this.vx += Math.sin(this.angle) * 0.03;
+                    this.vy += Math.cos(this.angle) * 0.03;
+                    this.angle += 0.01;
+                    this.vx *= 0.96;
+                    this.vy *= 0.96;
+                    this.x += this.vx;
+                    this.y += this.vy;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = this.color;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
         }
 
-        const photos = document.querySelectorAll('.photo-item');
-        const sphere = document.getElementById('sphere');
+        // Khởi tạo kích thước canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        // Giai đoạn 1: Ảnh bay hỗn loạn
-        function scatterPhotos() {
-            photos.forEach(photo => {
-                const randomX = (Math.random() * 100 - 50) * 10; 
-                const randomY = (Math.random() * 100 - 50) * 10;
-                const randomZ = (Math.random() * 60 - 30) * 10;
-                photo.style.transform = `translate3d(${randomX}px, ${randomY}px, ${randomZ}px) rotate(${(Math.random()*60 - 30)}deg)`;
+        // Tạo lượng hạt ban đầu
+        for (let i = 0; i < maxParticles; i++) {
+            particles.push(new Particle());
+        }
+
+        // Trích xuất mảng tọa độ điểm chữ từ Canvas ẩn
+        function getTextTargets(text, styleType) {
+            textCanvas.width = window.innerWidth;
+            textCanvas.height = window.innerHeight;
+            textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+
+            let fontSize = Math.min(window.innerWidth * 0.08, 65);
+            if (window.innerWidth <= 600) {
+                fontSize = Math.min(window.innerWidth * 0.1, 35);
+            }
+
+            // Thiết lập font chữ điện ảnh
+            textCtx.font = `700 ${fontSize}px 'Dancing Script', cursive`;
+            textCtx.fillStyle = '#ffffff';
+            textCtx.textAlign = 'center';
+            textCtx.textBaseline = 'middle';
+
+            // Xử lý xuống dòng cho chữ
+            const lines = text.split('\n');
+            const lineHeight = fontSize * 1.4;
+            const startY = (textCanvas.height / 2) - ((lines.length - 1) * lineHeight / 2);
+
+            lines.forEach((line, index) => {
+                textCtx.fillText(line, textCanvas.width / 2, startY + (index * lineHeight));
+            });
+
+            const imgData = textCtx.getImageData(0, 0, textCanvas.width, textCanvas.height);
+            const data = imgData.data;
+            const targets = [];
+
+            // Quét và lấy mẫu các pixel có màu
+            const step = window.innerWidth <= 600 ? 3 : 4; // Mật độ lấy mẫu để giữ cấu trúc chữ nét và sắc
+            for (let y = 0; y < textCanvas.height; y += step) {
+                for (let x = 0; x < textCanvas.width; x += step) {
+                    const alpha = data[((y * textCanvas.width) + x) * 4 + 3];
+                    if (alpha > 128) {
+                        targets.push({ x: x, y: y });
+                    }
+                }
+            }
+            return targets;
+        }
+
+        // Áp đặt mục tiêu chữ lên danh sách hạt sao hiện tại
+        function assignTextTargets(targets) {
+            // Tráo ngẫu nhiên để các hạt bay tự do tìm vị trí tự nhiên nhất
+            const shuffledParticles = [...particles].sort(() => Math.random() - 0.5);
+            
+            shuffledParticles.forEach((particle, idx) => {
+                if (idx < targets.length) {
+                    particle.tx = targets[idx].x;
+                    particle.ty = targets[idx].y;
+                    particle.hasTarget = true;
+                } else {
+                    particle.hasTarget = false;
+                    // Phân tán các hạt dư thừa trôi xung quanh rìa làm nền lung linh
+                    particle.tx = null;
+                    particle.ty = null;
+                }
             });
         }
 
-        // Giai đoạn 2: Gom thành quả cầu
+        // Giải phóng hạt sao (Xóa mục tiêu bay)
+        function clearTextTargets() {
+            particles.forEach(p => {
+                p.hasTarget = false;
+                // Thêm lực đẩy nhẹ khi rời chữ để tạo hiệu ứng tan vỡ nghệ thuật
+                p.vx = (Math.random() - 0.5) * 8;
+                p.vy = (Math.random() - 0.5) * 8;
+            });
+        }
+
+        // Vòng lặp vẽ liên tục (Animation loop)
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Chế độ hòa trộn màu sắc giúp các điểm chồng lấn phát sáng rực rỡ
+            ctx.globalCompositeOperation = 'screen';
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            // Nếu đang ở giai đoạn quả cầu, ta cho các hạt bay lơ lửng xoay chuyển vòng quanh quả cầu 3D
+            if (currentPhase === 'SPHERE_FLOW') {
+                updateSphereFlowParticles();
+            }
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+        animate();
+
+        // ----------------------------------------------------
+        // KỊCH BẢN ĐIỆN ẢNH CHUYỂN PHÂN CẢNH TỪNG CHƯƠNG (CINEMATIC SCENARIO)
+        // ----------------------------------------------------
+        function shatterHeartAndStart(event) {
+            const heart = document.getElementById('heartTrigger');
+            const rect = heart.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // 1. Tạo lực nổ hướng tâm cho các hạt bụi sao
+            currentPhase = 'SCATTER';
+            particles.forEach(p => {
+                const angle = Math.atan2(p.y - centerY, p.x - centerX);
+                const force = Math.random() * 15 + 8;
+                p.vx = Math.cos(angle) * force;
+                p.vy = Math.sin(angle) * force;
+            });
+
+            // 2. Ẩn màn hình khởi động đi dần dần
+            document.getElementById('start-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('start-screen').style.display = 'none';
+            }, 1500);
+
+            // Khởi chạy kịch bản chuỗi thời gian
+            startCinemaMagic();
+        }
+
+        function startCinemaMagic() {
+            // Phát nhạc nền
+            document.getElementById('bgMusic').play().catch(() => console.log("Yêu cầu duyệt tương tác trước"));
+
+            // --- GIÂY 1.5: Hạt bụi sao tụ lại tạo chữ số 1 ---
+            setTimeout(() => {
+                currentPhase = 'TEXT1';
+                const targets1 = getTextTargets("Gửi em bé bé nhỏ\ncủa anh... 🤍");
+                assignTextTargets(targets1);
+            }, 1500);
+
+            // --- GIÂY 5.5: Giải phóng chữ 1 (Bay phân rã lãng mạn) ---
+            setTimeout(() => {
+                clearTextTargets();
+            }, 5500);
+
+            // --- GIÂY 6.8: Tụ lại tạo chữ số 2 chúc mừng ---
+            setTimeout(() => {
+                currentPhase = 'TEXT2';
+                const targets2 = getTextTargets("Chúc Mừng Ngày\nQuốc Tế Thiếu Nhi 1/6 ✨");
+                assignTextTargets(targets2);
+            }, 6800);
+
+            // --- GIÂY 11.0: Giải phóng chữ 2 ---
+            setTimeout(() => {
+                clearTextTargets();
+            }, 11000);
+
+            // --- GIÂY 12.0: Bung tỏa ảnh lộng lẫy bay bồng bềnh tự do ---
+            setTimeout(() => {
+                scatterPhotos();
+            }, 12000);
+
+            // --- GIÂY 16.0: Gom các ảnh thành quả cầu xoay 3D khổng lồ ---
+            setTimeout(() => {
+                formSphere();
+                // Chuyển dòng chảy của các hạt sao thành dòng chảy vũ trụ bao quanh quả cầu
+                currentPhase = 'SPHERE_FLOW';
+                initSphereFlowParticles();
+            }, 16000);
+
+            // --- GIÂY 18.5: Hiện tên và nút bấm thư tay kính mờ ---
+            setTimeout(() => {
+                document.getElementById('main-name').style.opacity = '1';
+                document.getElementById('btn-open-letter').style.opacity = '1';
+                document.getElementById('mainScene').classList.add('interactive');
+            }, 18500);
+        }
+
+        // ----------------------------------------------------
+        // DÒNG CHẢY HẠT VŨ TRỤ BAO QUANH QUẢ CẦU (SPHERE FLOW PHYSICS)
+        // ----------------------------------------------------
+        function initSphereFlowParticles() {
+            particles.forEach(p => {
+                p.hasTarget = false;
+                // Tạo quỹ đạo xoay tròn quanh tâm màn hình
+                p.angle = Math.random() * Math.PI * 2;
+                p.radius = Math.random() * 200 + 220; // Bán kính bao quanh quả cầu 3D
+                p.angularSpeed = (Math.random() * 0.015 + 0.005) * (Math.random() > 0.5 ? 1 : -1);
+            });
+        }
+
+        function updateSphereFlowParticles() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            particles.forEach(p => {
+                p.angle += p.angularSpeed;
+                const targetX = centerX + Math.cos(p.angle) * p.radius;
+                const targetY = centerY + Math.sin(p.angle) * p.radius * 0.4; // Tạo hình dải dẹt elip như vành đai sao Thổ
+
+                p.x += (targetX - p.x) * 0.05;
+                p.y += (targetY - p.y) * 0.05;
+            });
+        }
+
+        // ----------------------------------------------------
+        // SETUP DANH SÁCH ẢNH & HIỆU ỨNG QUẢ CẦU 3D TO HƠN
+        // ----------------------------------------------------
+        const photos = document.querySelectorAll('.photo-item');
+        const sphere = document.getElementById('sphere');
+        let isSphereFormed = false;
+
+        // 1. Tán loạn ảnh ra không gian 3D ngẫu nhiên ban đầu
+        function scatterPhotos() {
+            photos.forEach(photo => {
+                photo.style.opacity = '1';
+                
+                const randomX = (Math.random() * 120 - 60) * 10; 
+                const randomY = (Math.random() * 120 - 60) * 10;
+                const randomZ = (Math.random() * 80 - 40) * 10;
+                const randomRot = (Math.random() * 80 - 40);
+                
+                const transformStr = `translate3d(${randomX}px, ${randomY}px, ${randomZ}px) scale(1) rotate(${randomRot}deg)`;
+                photo.style.transform = transformStr;
+                photo.dataset.origTransform = transformStr; 
+            });
+        }
+
+        // 2. Gom hội tụ toàn bộ ảnh thành khối cầu xoay 3D to đẹp
         function formSphere() {
-            const radius = 240; 
+            const isMobile = window.innerWidth <= 600;
+            // Bán kính lớn phối hợp với kích thước ảnh phóng to không bị đè nhau
+            const radius = isMobile ? 190 : 300; 
             const total = photos.length;
             
             photos.forEach((photo, index) => {
@@ -286,48 +754,147 @@
                 const y = radius * Math.sin(phi) * Math.sin(theta);
                 const z = radius * Math.cos(phi);
 
-                photo.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${theta * 180 / Math.PI}deg) rotateX(${90 - phi * 180 / Math.PI}deg)`;
+                const rotY = theta * 180 / Math.PI;
+                const rotX = 90 - phi * 180 / Math.PI;
+
+                const transformStr = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${rotY}deg) rotateX(${rotX}deg) scale(1)`;
+                photo.style.transform = transformStr;
+                photo.dataset.origTransform = transformStr; 
+                
+                photo.dataset.dragX = '0';
+                photo.dataset.dragY = '0';
             });
 
-            // Hiệu ứng quả cầu xoay tròn
+            // Chế độ tự động xoay lãng mạn trong không gian cầu
             let angle = 0;
             setInterval(() => {
-                angle += 0.3;
-                sphere.style.transform = `rotateY(${angle}deg) rotateX(${angle/3}deg)`;
+                angle += 0.22;
+                if (!isDragging) {
+                    sphere.style.transform = `rotateY(${angle}deg) rotateX(${angle / 4}deg)`;
+                }
             }, 30);
+
+            isSphereFormed = true;
         }
 
-        function startMagic() {
-            // Tắt màn hình chờ
-            const startScreen = document.getElementById('start-screen');
-            startScreen.style.opacity = '0';
-            setTimeout(() => startScreen.style.display = 'none', 1000);
+        // ----------------------------------------------------
+        // HỆ THỐNG KÉO THẢ TƯƠNG TÁC ĐA CHẠM SIÊU MƯỢT TRÊN ẢNH
+        // ----------------------------------------------------
+        let activeDragItem = null;
+        let startPointerX, startPointerY;
+        let originalDragX = 0, originalDragY = 0;
+        let isDragging = false;
+
+        photos.forEach(photo => {
+            photo.addEventListener('pointerdown', dragStart);
+        });
+
+        window.addEventListener('pointermove', dragMove);
+        window.addEventListener('pointerup', dragEnd);
+        window.addEventListener('pointercancel', dragEnd);
+
+        function dragStart(e) {
+            if (!isSphereFormed) return; 
             
-            // Bật nhạc
-            document.getElementById('bgMusic').play().catch(() => console.log("Lỗi tự động phát nhạc"));
-
-            // Tung ảnh lên không gian
-            scatterPhotos();
-
-            // Sau 4 giây thì gom thành quả cầu
-            setTimeout(() => {
-                formSphere();
-            }, 4000);
-
-            // Sau 6 giây (khi quả cầu gom xong) thì hiện tên và nút mở thư
-            setTimeout(() => {
-                document.getElementById('main-name').style.opacity = '1';
-                document.getElementById('btn-open-letter').style.opacity = '1';
-            }, 6000);
+            activeDragItem = e.currentTarget;
+            activeDragItem.style.transition = 'none'; 
+            activeDragItem.style.zIndex = '999'; 
+            
+            activeDragItem.setPointerCapture(e.pointerId); 
+            
+            startPointerX = e.clientX;
+            startPointerY = e.clientY;
+            
+            originalDragX = parseFloat(activeDragItem.dataset.dragX) || 0;
+            originalDragY = parseFloat(activeDragItem.dataset.dragY) || 0;
+            
+            isDragging = true;
         }
 
-        // Bật/tắt thư tay
+        function dragMove(e) {
+            if (!isDragging || !activeDragItem) return;
+            e.preventDefault();
+            
+            const deltaX = e.clientX - startPointerX;
+            const deltaY = e.clientY - startPointerY;
+            
+            const currentDragX = originalDragX + deltaX;
+            const currentDragY = originalDragY + deltaY;
+            
+            activeDragItem.dataset.dragX = currentDragX;
+            activeDragItem.dataset.dragY = currentDragY;
+            
+            const origTransform = activeDragItem.dataset.origTransform || '';
+            // Nâng ảnh lên cao hơn (Z-axis = 180px) khi kéo tạo chiều sâu nổi 3D cực mạnh
+            activeDragItem.style.transform = `${origTransform} translate3d(${currentDragX}px, ${currentDragY}px, 180px) scale(1.25)`;
+        }
+
+        function dragEnd(e) {
+            if (!isDragging || !activeDragItem) return;
+            isDragging = false;
+            
+            activeDragItem.releasePointerCapture(e.pointerId);
+            activeDragItem.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 2s';
+            
+            activeDragItem = null;
+        }
+
+        // ----------------------------------------------------
+        // HIỆU ỨNG GÕ CHỮ TRONG LÁ THƯ TAY (TYPEWRITER MECHANICS)
+        // ----------------------------------------------------
+        const fullLetterHTML = `Hôm nay 01-06-2025 Là ngày "Quốc tế thiếu nhi".<br><br>Embee bé nhỏ của anh, anh chúc embee có một ngày vui vẻ, hạnh phúc và mãi là embee của anh, chúc cho đôi mình bên nhau thật bền lâu.<br><br>Happy to you 1 day vui vẻ ạ ❤️<br><br><span style="font-size: 0.95rem; color: #ccb3d1; font-style: italic;">(lâu rồi không làm mong em tạm chấp nhận nhé ^^)</span>`;
+        
+        let typewriterActiveTimer = null;
+
+        function runSafeTypewriter(element, htmlText, speed) {
+            element.innerHTML = ""; 
+            let charIndex = 0;
+            
+            const cursor = document.createElement('span');
+            cursor.classList.add('typewriter-cursor');
+            element.appendChild(cursor);
+
+            function type() {
+                if (charIndex < htmlText.length) {
+                    if (htmlText.charAt(charIndex) === '<') {
+                        const closingTagIndex = htmlText.indexOf('>', charIndex);
+                        if (closingTagIndex !== -1) {
+                            const tagMarkup = htmlText.substring(charIndex, closingTagIndex + 1);
+                            cursor.insertAdjacentHTML('beforebegin', tagMarkup);
+                            charIndex = closingTagIndex + 1;
+                        } else {
+                            cursor.insertAdjacentText('beforebegin', htmlText.charAt(charIndex));
+                            charIndex++;
+                        }
+                    } else {
+                        cursor.insertAdjacentText('beforebegin', htmlText.charAt(charIndex));
+                        charIndex++;
+                    }
+                    typewriterActiveTimer = setTimeout(type, speed);
+                } else {
+                    cursor.style.display = 'none';
+                }
+            }
+            type();
+        }
+
+        // Đóng / Mở Modal Thư Kính Mờ
         function toggleLetter(show) {
             const modal = document.getElementById('letter-modal');
-            if(show) {
+            const contentBox = document.getElementById('letterText');
+            
+            if (typewriterActiveTimer) {
+                clearTimeout(typewriterActiveTimer);
+            }
+
+            if (show) {
                 modal.classList.add('show');
+                setTimeout(() => {
+                    runSafeTypewriter(contentBox, fullLetterHTML, 45); 
+                }, 200);
             } else {
                 modal.classList.remove('show');
+                contentBox.innerHTML = ""; 
             }
         }
     </script>
