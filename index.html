@@ -27,18 +27,19 @@
             font-family: 'Quicksand', sans-serif;
         }
 
-        /* Canvas hạt bụi sao lấp lánh (Nền chính của cả ứng dụng) */
-        #particleCanvas {
+        /* ----------------------------------------------------
+           1. NỀN THIÊN HÀ LẤP LÁNH & CHUYỂN ĐỘNG DYNAMIC
+           ---------------------------------------------------- */
+        .stars-wrapper {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
+            background: radial-gradient(circle at center, #120022 0%, #03000a 100%);
             z-index: 1;
-            pointer-events: none;
+            overflow: hidden;
         }
 
-        /* Dải sương mù ngân hà chuyển màu chậm rãi phía sau */
+        /* Dải sương mù ngân hà chuyển màu chậm rãi */
         .nebula-cloud {
             position: absolute;
             width: 800px;
@@ -47,7 +48,7 @@
             background: radial-gradient(circle, rgba(255, 0, 128, 0.08) 0%, rgba(120, 0, 255, 0.05) 50%, rgba(0, 0, 0, 0) 70%);
             filter: blur(80px);
             pointer-events: none;
-            z-index: 0;
+            z-index: 1;
             animation: nebulaDrift 20s infinite alternate ease-in-out;
         }
 
@@ -56,13 +57,68 @@
             100% { transform: translate(10%, 10%) scale(1.2); }
         }
 
+        /* Các vì sao lấp lánh tĩnh */
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: blink var(--duration) infinite ease-in-out;
+            opacity: 0.3;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px #ffb3d9, 0 0 20px #fff; }
+        }
+
+        /* Hạt bụi sao chuyển động trôi nổi chậm (Stardust) */
+        .stardust {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: drift var(--drift-duration) linear infinite;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translateY(105vh) translateX(0) scale(0.5);
+                opacity: 0;
+            }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% {
+                transform: translateY(-5vh) translateX(var(--drift-x)) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Cấu trúc Sao Băng rơi */
+        .shooting-star {
+            position: absolute;
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255, 179, 217, 1) 0%, rgba(255, 255, 255, 0) 100%);
+            transform: rotate(-35deg);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 2;
+            animation: shoot linear forwards;
+        }
+
+        @keyframes shoot {
+            0% { transform: translate(0, 0) rotate(-35deg) scale(0); opacity: 0; }
+            15% { opacity: 1; transform: translate(-30px, 21px) rotate(-35deg) scale(1); }
+            100% { transform: translate(-500px, 350px) rotate(-35deg) scale(0.3); opacity: 0; }
+        }
+
         /* ----------------------------------------------------
-           1. MÀN HÌNH KHỞI ĐẦU: TRÁI TIM ĐẬP NEON
+           2. MÀN HÌNH KHỞI ĐẦU: TRÁI TIM ĐẬP & HIỆU ỨNG VỠ TAN
            ---------------------------------------------------- */
         #start-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 0, 10, 0.9);
+            background: #030005;
             z-index: 999;
             display: flex;
             flex-direction: column;
@@ -122,8 +178,88 @@
             100% { transform: scale(1); }
         }
 
+        /* Các mảnh sao vỡ tan khi click trái tim */
+        .shattered-particle {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.5rem;
+            color: #ffb3d9;
+            z-index: 9999;
+            text-shadow: 0 0 8px #ff1a8c, 0 0 15px #fff;
+            animation: explodeParticle var(--exp-dur) cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes explodeParticle {
+            0% {
+                transform: translate(0, 0) scale(1.5) rotate(0deg);
+                opacity: 1;
+            }
+            80% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--rot));
+                opacity: 0;
+            }
+        }
+
         /* ----------------------------------------------------
-           2. KHÔNG GIAN 3D & ẢNH LỘNG LẪY (SPHERE PHOTO)
+           3. HIỆU ỨNG CHỮ CHẠY ĐIỆN ẢNH (CINEMATIC LYRICS)
+           ---------------------------------------------------- */
+        #intro-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .intro-text {
+            font-family: 'Dancing Script', cursive;
+            color: #fff;
+            text-align: center;
+            opacity: 0;
+            filter: blur(15px);
+            transform: scale(0.85);
+            transition: all 1.8s cubic-bezier(0.25, 1, 0.5, 1);
+            position: absolute;
+            width: 90%;
+            max-width: 800px;
+            pointer-events: none;
+        }
+
+        .intro-text.style-1 {
+            font-size: 3.5rem;
+            text-shadow: 0 0 25px rgba(255, 179, 217, 0.9), 0 0 45px rgba(255, 26, 140, 0.6);
+            color: #ffccd5;
+        }
+
+        .intro-text.style-2 {
+            font-size: 4rem;
+            text-shadow: 0 0 30px rgba(255, 26, 140, 0.9), 0 0 60px rgba(153, 0, 255, 0.8);
+            background: linear-gradient(45deg, #ff80df, #ff1a8c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.4;
+        }
+
+        .intro-text.active {
+            opacity: 1;
+            filter: blur(0px);
+            transform: scale(1);
+        }
+
+        .intro-text.disperse {
+            opacity: 0;
+            filter: blur(25px);
+            transform: scale(1.15);
+        }
+
+        /* ----------------------------------------------------
+           4. KHÔNG GIAN 3D & ẢNH ĐÃ TĂNG KÍCH THƯỚC (SPHERE PHOTO)
            ---------------------------------------------------- */
         .scene {
             position: relative;
@@ -133,28 +269,23 @@
             justify-content: center;
             align-items: center;
             z-index: 2;
-            pointer-events: none; /* Chỉ cho phép chạm khi quả cầu xuất hiện */
-        }
-
-        .scene.interactive {
-            pointer-events: auto;
         }
 
         .sphere-container {
             position: relative;
-            width: 350px;
+            width: 350px; /* Tăng nhẹ kích thước container */
             height: 350px;
             transform-style: preserve-3d;
             transition: transform 1s ease;
         }
 
-        /* Kích thước hình ảnh to tròn, viền LED hồng neon sắc nét */
+        /* TĂNG KÍCH THƯỚC HÌNH ẢNH TO VÀ LỘNG LẪY HƠN */
         .photo-item {
             position: absolute;
-            width: 130px; 
-            height: 173px; 
+            width: 130px; /* Tăng từ 90px lên 130px */
+            height: 173px; /* Tăng từ 120px lên 173px (Tỷ lệ 3:4 chuẩn) */
             object-fit: cover;
-            border-radius: 16px; 
+            border-radius: 16px; /* Bo góc mượt mà hơn */
             border: 2px solid rgba(255, 255, 255, 0.6);
             box-shadow: 0 0 20px rgba(255, 26, 140, 0.9), 0 0 40px rgba(153, 0, 255, 0.5);
             opacity: 0;
@@ -170,7 +301,7 @@
         }
 
         /* ----------------------------------------------------
-           3. THỜI KHẮC CUỐI & HỘP THƯ TAY (GLASSMORPHISM)
+           5. THỜI KHẮC CUỐI & HỘP THƯ TAY (GLASSMORPHISM)
            ---------------------------------------------------- */
         #main-name {
             position: absolute;
@@ -218,7 +349,7 @@
             position: fixed;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%) scale(0.85);
-            background: rgba(15, 5, 25, 0.88);
+            background: rgba(15, 5, 25, 0.85);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -282,12 +413,12 @@
         }
 
         /* ----------------------------------------------------
-           4. HỖ TRỢ THIẾT BỊ DI ĐỘNG (MOBILE RESPONSIVE)
+           6. HỖ TRỢ THIẾT BỊ DI ĐỘNG (MOBILE RESPONSIVE)
            ---------------------------------------------------- */
         @media (max-width: 600px) {
             .photo-item {
-                width: 100px; 
-                height: 133px; 
+                width: 100px; /* Tăng từ 75px lên 100px trên mobile */
+                height: 133px; /* Tỷ lệ 3:4 tương ứng */
             }
             .sphere-container {
                 width: 250px;
@@ -299,6 +430,12 @@
             .heart-wrapper {
                 width: 110px;
                 height: 110px;
+            }
+            .intro-text.style-1 {
+                font-size: 2.5rem;
+            }
+            .intro-text.style-2 {
+                font-size: 2.6rem;
             }
             #main-name {
                 font-size: 2.8rem;
@@ -317,12 +454,6 @@
     <!-- Nhạc nền chất lượng cao -->
     <audio id="bgMusic" src="nhac.mp3" loop></audio>
 
-    <!-- Hộp sương mù ngân hà đổi màu ở nền sâu -->
-    <div class="nebula-cloud"></div>
-
-    <!-- Canvas chính vẽ hiệu ứng hạt sao hồng tụ thành chữ -->
-    <canvas id="particleCanvas"></canvas>
-
     <!-- MÀN HÌNH KHỞI ĐỘNG: TRÁI TIM ĐẬP NHỊP SANG TRỌNG -->
     <div id="start-screen">
         <h1>Quà Quốc Tế Thiếu Nhi ✨</h1>
@@ -332,28 +463,39 @@
                 c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z"/>
             </svg>
         </div>
-        <p style="margin-top: 30px; color: #ffb3d9; font-style: italic; letter-spacing: 1px; font-size: 1rem; text-shadow: 0 0 10px #ff2a85;">Chạm vào trái tim hồng để mở quà...</p>
+        <p style="margin-top: 30px; color: #ffb3d9; font-style: italic; letter-spacing: 1px; font-size: 1rem; animation: pulseGlow textGlowPulse 1.5s infinite alternate;">Chạm vào trái tim hồng để mở quà...</p>
+    </div>
+
+    <!-- Hệ thống cực quang và sao nền chuyển động lấp lánh -->
+    <div class="stars-wrapper" id="starsContainer">
+        <div class="nebula-cloud"></div>
+    </div>
+
+    <!-- Khu vực giới thiệu chữ điện ảnh chuyển đổi -->
+    <div id="intro-container">
+        <div class="intro-text style-1" id="text-1">Gửi em bé bé nhỏ của anh... 🤍</div>
+        <div class="intro-text style-2" id="text-2">Chúc Mừng Ngày<br>Quốc Tế Thiếu Nhi 1/6 ✨</div>
     </div>
 
     <!-- Không gian chứa quả cầu 3D tương tác -->
-    <div class="scene" id="mainScene">
+    <div class="scene">
         <div class="sphere-container" id="sphere">
             <!-- 15 bức ảnh sẵn sàng cho sự kiện chuyển động -->
-            <img src="anh1.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Anh+Thư'">
-            <img src="anh2.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Xinh+Đẹp'">
-            <img src="anh3.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Em+Bé'">
-            <img src="anh4.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Xinh+Ngoan'">
-            <img src="anh5.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Dễ+Thương'">
-            <img src="anh6.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Cute'">
-            <img src="anh7.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Princess'">
-            <img src="anh8.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Love+U'">
-            <img src="anh9.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Angel'">
-            <img src="anh10.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=My+Girl'">
-            <img src="anh11.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Anh+Thư+💖'">
-            <img src="anh12.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Quả+Cầu+3D'">
-            <img src="anh13.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Thiếu+Nhi'">
-            <img src="anh14.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Ngọt+Ngào'">
-            <img src="anh15.jpg" class="photo-item" alt="anh" onerror="this.src='https://placehold.co/300x400/1a001a/ff66b2?text=Mãi+Yêu'">
+            <img src="anh1.jpg" class="photo-item" alt="anh">
+            <img src="anh2.jpg" class="photo-item" alt="anh">
+            <img src="anh3.jpg" class="photo-item" alt="anh">
+            <img src="anh4.jpg" class="photo-item" alt="anh">
+            <img src="anh5.jpg" class="photo-item" alt="anh">
+            <img src="anh6.jpg" class="photo-item" alt="anh">
+            <img src="anh7.jpg" class="photo-item" alt="anh">
+            <img src="anh8.jpg" class="photo-item" alt="anh">
+            <img src="anh9.jpg" class="photo-item" alt="anh">
+            <img src="anh10.jpg" class="photo-item" alt="anh">
+            <img src="anh11.jpg" class="photo-item" alt="anh">
+            <img src="anh12.jpg" class="photo-item" alt="anh">
+            <img src="anh13.jpg" class="photo-item" alt="anh">
+            <img src="anh14.jpg" class="photo-item" alt="anh">
+            <img src="anh15.jpg" class="photo-item" alt="anh">
         </div>
     </div>
 
@@ -369,351 +511,112 @@
 
     <script>
         // ----------------------------------------------------
-        // HỆ THỐNG ENGINE HẠT BỤI SAO HỘI TỤ (TEXT PARTICLES ENGINE)
+        // KHỞI TẠO BẦU TRỜI SAO TRÔI NỔI & LẤP LÁNH LIÊN TỤC
         // ----------------------------------------------------
-        const canvas = document.getElementById('particleCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Khởi tạo Canvas ẩn để trích xuất tọa độ điểm của chữ
-        const textCanvas = document.createElement('canvas');
-        const textCtx = textCanvas.getContext('2d', { willReadFrequently: true });
-
-        let particles = [];
-        const maxParticles = 2800; // Đống bụi sao cực dày đặc tương tự như bức hình
-        let currentPhase = 'AMBIENT'; // AMBIENT, SCATTER, TEXT1, TEXT2, TEXT3, SPHERE_FLOW
-        let animationFrameId = null;
-
-        // Bảng màu hồng, tím neon cực sang xịn lấp lánh giống video
-        const cosmicColors = [
-            'rgba(255, 26, 140, 0.95)',  // Hồng neon đậm
-            'rgba(255, 128, 191, 0.9)',  // Hồng phấn nhạt rực rỡ
-            'rgba(180, 51, 255, 0.95)',  // Tím rực rỡ
-            'rgba(255, 255, 255, 0.95)', // Hạt sao trắng sáng lấp lánh
-            'rgba(255, 77, 166, 0.9)'    // Hồng tươi
-        ];
-
-        // Lớp hạt vũ trụ
-        class Particle {
-            constructor() {
-                this.reset(true);
-            }
-
-            reset(initAll = false) {
-                if (initAll) {
-                    this.x = Math.random() * window.innerWidth;
-                    this.y = Math.random() * window.innerHeight;
-                } else {
-                    // Xuất hiện từ viền hoặc trung tâm tùy ý thích
-                    this.x = window.innerWidth / 2;
-                    this.y = window.innerHeight / 2;
-                }
-                this.vx = (Math.random() - 0.5) * 3;
-                this.vy = (Math.random() - 0.5) * 3;
-                this.size = Math.random() * 2 + 0.8; // Kích cỡ hạt cát sao nhỏ rực rỡ
-                this.baseSize = this.size;
-                this.color = cosmicColors[Math.floor(Math.random() * cosmicColors.length)];
-                
-                // Thuộc tính phục vụ tụ chữ
-                this.tx = null; // Target X
-                this.ty = null; // Target Y
-                this.hasTarget = false;
-                this.ease = Math.random() * 0.05 + 0.04; // Tốc độ tụ chữ ngẫu nhiên tạo độ mượt
-                this.angle = Math.random() * Math.PI * 2;
-                this.speed = Math.random() * 0.5 + 0.2;
-                
-                // Hiệu ứng lấp lánh
-                this.alpha = Math.random() * 0.5 + 0.5;
-                this.alphaSpeed = Math.random() * 0.02 + 0.01;
-            }
-
-            update() {
-                // Hiệu ứng lấp lánh nhấp nháy nhè nhẹ
-                this.alpha += this.alphaSpeed;
-                if (this.alpha > 1 || this.alpha < 0.3) {
-                    this.alphaSpeed = -this.alphaSpeed;
-                }
-
-                if (currentPhase === 'AMBIENT') {
-                    // Trôi nổi tự nhiên, xoáy lờ đờ hướng về trung tâm (tạo hào quang cho trái tim)
-                    let dx = window.innerWidth / 2 - this.x;
-                    let dy = window.innerHeight / 2 - this.y;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist > 10) {
-                        this.vx += (dx / dist) * 0.02;
-                        this.vy += (dy / dist) * 0.02;
-                    }
-                    this.vx += Math.sin(this.angle) * 0.05;
-                    this.vy += Math.cos(this.angle) * 0.05;
-                    this.angle += 0.01;
-
-                    // Giới hạn tốc độ
-                    this.vx *= 0.98;
-                    this.vy *= 0.98;
-
-                    this.x += this.vx;
-                    this.y += this.vy;
-
-                    // Giới hạn màn hình
-                    if (this.x < 0 || this.x > window.innerWidth || this.y < 0 || this.y > window.innerHeight) {
-                        this.reset(true);
-                    }
-                } 
-                else if (currentPhase === 'SCATTER') {
-                    // Bay tỏa lực nổ cực nhanh
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    this.vx *= 0.97;
-                    this.vy *= 0.97;
-                } 
-                else if (this.hasTarget) {
-                    // Hiệu ứng tụ chữ mượt mà cực kỳ nghệ thuật
-                    let dx = this.tx - this.x;
-                    let dy = this.ty - this.y;
-                    
-                    // Bay tụ vào điểm mục tiêu bằng thuật toán hấp dẫn
-                    this.x += dx * this.ease;
-                    this.y += dy * this.ease;
-                    
-                    // Thêm chút xao động gió thổi nhẹ cho chữ tựa như dải cát động
-                    this.x += Math.sin(this.angle) * 0.25;
-                    this.y += Math.cos(this.angle) * 0.25;
-                    this.angle += 0.05;
-                    
-                    this.size = this.baseSize * (1 + (Math.sin(this.angle) * 0.3));
-                } 
-                else {
-                    // Những hạt dư thừa không có mục tiêu chữ sẽ lững lờ trôi làm background
-                    this.vx += Math.sin(this.angle) * 0.03;
-                    this.vy += Math.cos(this.angle) * 0.03;
-                    this.angle += 0.01;
-                    this.vx *= 0.96;
-                    this.vy *= 0.96;
-                    this.x += this.vx;
-                    this.y += this.vy;
-                }
-            }
-
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.shadowBlur = 4;
-                ctx.shadowColor = this.color;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            }
+        const starsContainer = document.getElementById('starsContainer');
+        
+        // Tạo 120 vì sao lấp lánh tĩnh
+        for (let i = 0; i < 120; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 100 + 'vh';
+            star.style.setProperty('--duration', (Math.random() * 3 + 1.5) + 's');
+            starsContainer.appendChild(star);
         }
 
-        // Khởi tạo kích thước canvas
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Tạo lượng hạt ban đầu
-        for (let i = 0; i < maxParticles; i++) {
-            particles.push(new Particle());
-        }
-
-        // Trích xuất mảng tọa độ điểm chữ từ Canvas ẩn
-        function getTextTargets(text, styleType) {
-            textCanvas.width = window.innerWidth;
-            textCanvas.height = window.innerHeight;
-            textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-
-            let fontSize = Math.min(window.innerWidth * 0.08, 65);
-            if (window.innerWidth <= 600) {
-                fontSize = Math.min(window.innerWidth * 0.1, 35);
-            }
-
-            // Thiết lập font chữ điện ảnh
-            textCtx.font = `700 ${fontSize}px 'Dancing Script', cursive`;
-            textCtx.fillStyle = '#ffffff';
-            textCtx.textAlign = 'center';
-            textCtx.textBaseline = 'middle';
-
-            // Xử lý xuống dòng cho chữ
-            const lines = text.split('\n');
-            const lineHeight = fontSize * 1.4;
-            const startY = (textCanvas.height / 2) - ((lines.length - 1) * lineHeight / 2);
-
-            lines.forEach((line, index) => {
-                textCtx.fillText(line, textCanvas.width / 2, startY + (index * lineHeight));
-            });
-
-            const imgData = textCtx.getImageData(0, 0, textCanvas.width, textCanvas.height);
-            const data = imgData.data;
-            const targets = [];
-
-            // Quét và lấy mẫu các pixel có màu
-            const step = window.innerWidth <= 600 ? 3 : 4; // Mật độ lấy mẫu để giữ cấu trúc chữ nét và sắc
-            for (let y = 0; y < textCanvas.height; y += step) {
-                for (let x = 0; x < textCanvas.width; x += step) {
-                    const alpha = data[((y * textCanvas.width) + x) * 4 + 3];
-                    if (alpha > 128) {
-                        targets.push({ x: x, y: y });
-                    }
-                }
-            }
-            return targets;
+        // Tạo 60 hạt bụi sao bay trôi nổi chuyển động liên tục (Stardust)
+        for (let i = 0; i < 60; i++) {
+            const dust = document.createElement('div');
+            dust.classList.add('stardust');
+            dust.style.width = (Math.random() * 2 + 1.5) + 'px';
+            dust.style.height = dust.style.width;
+            dust.style.left = Math.random() * 100 + 'vw';
+            dust.style.setProperty('--drift-duration', (Math.random() * 8 + 6) + 's');
+            dust.style.setProperty('--drift-x', (Math.random() * 150 - 75) + 'px');
+            dust.style.animationDelay = (Math.random() * 8) + 's';
+            starsContainer.appendChild(dust);
         }
 
-        // Áp đặt mục tiêu chữ lên danh sách hạt sao hiện tại
-        function assignTextTargets(targets) {
-            // Tráo ngẫu nhiên để các hạt bay tự do tìm vị trí tự nhiên nhất
-            const shuffledParticles = [...particles].sort(() => Math.random() - 0.5);
+        // Hàm tạo vệt sao băng ngẫu nhiên thơ mộng
+        function createShootingStar() {
+            const shootingStar = document.createElement('div');
+            shootingStar.classList.add('shooting-star');
             
-            shuffledParticles.forEach((particle, idx) => {
-                if (idx < targets.length) {
-                    particle.tx = targets[idx].x;
-                    particle.ty = targets[idx].y;
-                    particle.hasTarget = true;
-                } else {
-                    particle.hasTarget = false;
-                    // Phân tán các hạt dư thừa trôi xung quanh rìa làm nền lung linh
-                    particle.tx = null;
-                    particle.ty = null;
-                }
-            });
-        }
-
-        // Giải phóng hạt sao (Xóa mục tiêu bay)
-        function clearTextTargets() {
-            particles.forEach(p => {
-                p.hasTarget = false;
-                // Thêm lực đẩy nhẹ khi rời chữ để tạo hiệu ứng tan vỡ nghệ thuật
-                p.vx = (Math.random() - 0.5) * 8;
-                p.vy = (Math.random() - 0.5) * 8;
-            });
-        }
-
-        // Vòng lặp vẽ liên tục (Animation loop)
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const startX = Math.random() * (window.innerWidth) + 200;
+            const startY = Math.random() * (window.innerHeight / 2) - 100;
+            const duration = Math.random() * 2 + 1.5; 
             
-            // Chế độ hòa trộn màu sắc giúp các điểm chồng lấn phát sáng rực rỡ
-            ctx.globalCompositeOperation = 'screen';
-
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-
-            // Nếu đang ở giai đoạn quả cầu, ta cho các hạt bay lơ lửng xoay chuyển vòng quanh quả cầu 3D
-            if (currentPhase === 'SPHERE_FLOW') {
-                updateSphereFlowParticles();
-            }
-
-            animationFrameId = requestAnimationFrame(animate);
+            shootingStar.style.left = startX + 'px';
+            shootingStar.style.top = startY + 'px';
+            shootingStar.style.animationDuration = duration + 's';
+            
+            starsContainer.appendChild(shootingStar);
+            
+            setTimeout(() => {
+                shootingStar.remove();
+            }, duration * 1000);
         }
-        animate();
+
+        // Kích hoạt chu kỳ sao băng rơi mỗi 3 giây
+        setInterval(createShootingStar, 3000);
 
         // ----------------------------------------------------
-        // KỊCH BẢN ĐIỆN ẢNH CHUYỂN PHÂN CẢNH TỪNG CHƯƠNG (CINEMATIC SCENARIO)
+        // HIỆU ỨNG TRÁI TIM VỠ TAN THÀNH NGÔI SAO LẤP LÁNH
         // ----------------------------------------------------
         function shatterHeartAndStart(event) {
             const heart = document.getElementById('heartTrigger');
             const rect = heart.getBoundingClientRect();
+            
+            // Tìm tọa độ trung tâm của trái tim tại thời điểm click
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            // 1. Tạo lực nổ hướng tâm cho các hạt bụi sao
-            currentPhase = 'SCATTER';
-            particles.forEach(p => {
-                const angle = Math.atan2(p.y - centerY, p.x - centerX);
-                const force = Math.random() * 15 + 8;
-                p.vx = Math.cos(angle) * force;
-                p.vy = Math.sin(angle) * force;
-            });
+            // Ký tự mảnh vụn: hỗn hợp các ngôi sao lấp lánh và tim nhỏ
+            const particles = ['✨', '⭐', '🌸', '💖', '✨', '✦', '✧'];
 
-            // 2. Ẩn màn hình khởi động đi dần dần
-            document.getElementById('start-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('start-screen').style.display = 'none';
-            }, 1500);
+            // Tạo 85 hạt nổ tung
+            for (let i = 0; i < 85; i++) {
+                const particle = document.createElement('span');
+                particle.classList.add('shattered-particle');
+                
+                // Chọn ngẫu nhiên loại hạt
+                particle.innerText = particles[Math.floor(Math.random() * particles.length)];
+                
+                // Set vị trí ban đầu tại tâm trái tim
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
 
-            // Khởi chạy kịch bản chuỗi thời gian
+                // Tính toán vận tốc bay theo vòng tròn (physics radial force)
+                const angle = Math.random() * Math.PI * 2; // Góc ngẫu nhiên 360 độ
+                const distance = Math.random() * 280 + 120; // Khoảng cách nổ bay xa từ 120px đến 400px
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance;
+                const rotation = Math.random() * 720 - 360; // Xoay tự do từ -360 đến 360 độ
+                const dur = Math.random() * 0.8 + 0.8; // Thời gian bay của hạt từ 0.8s đến 1.6s
+
+                particle.style.setProperty('--tx', dx + 'px');
+                particle.style.setProperty('--ty', dy + 'px');
+                particle.style.setProperty('--rot', rotation + 'deg');
+                particle.style.setProperty('--exp-dur', dur + 's');
+                
+                document.body.appendChild(particle);
+
+                // Tự giải phóng bộ nhớ của hạt sau khi hoàn thành animation
+                setTimeout(() => {
+                    particle.remove();
+                }, dur * 1000);
+            }
+
+            // Ẩn trái tim và tiêu đề mở đầu đi
+            heart.style.display = 'none';
+            document.querySelector('#start-screen h1').style.opacity = '0';
+            document.querySelector('#start-screen p').style.opacity = '0';
+
+            // Kích hoạt kịch bản phim lãng mạn
             startCinemaMagic();
-        }
-
-        function startCinemaMagic() {
-            // Phát nhạc nền
-            document.getElementById('bgMusic').play().catch(() => console.log("Yêu cầu duyệt tương tác trước"));
-
-            // --- GIÂY 1.5: Hạt bụi sao tụ lại tạo chữ số 1 ---
-            setTimeout(() => {
-                currentPhase = 'TEXT1';
-                const targets1 = getTextTargets("Gửi em bé bé nhỏ\ncủa anh... 🤍");
-                assignTextTargets(targets1);
-            }, 1500);
-
-            // --- GIÂY 5.5: Giải phóng chữ 1 (Bay phân rã lãng mạn) ---
-            setTimeout(() => {
-                clearTextTargets();
-            }, 5500);
-
-            // --- GIÂY 6.8: Tụ lại tạo chữ số 2 chúc mừng ---
-            setTimeout(() => {
-                currentPhase = 'TEXT2';
-                const targets2 = getTextTargets("Chúc Mừng Ngày\nQuốc Tế Thiếu Nhi 1/6 ✨");
-                assignTextTargets(targets2);
-            }, 6800);
-
-            // --- GIÂY 11.0: Giải phóng chữ 2 ---
-            setTimeout(() => {
-                clearTextTargets();
-            }, 11000);
-
-            // --- GIÂY 12.0: Bung tỏa ảnh lộng lẫy bay bồng bềnh tự do ---
-            setTimeout(() => {
-                scatterPhotos();
-            }, 12000);
-
-            // --- GIÂY 16.0: Gom các ảnh thành quả cầu xoay 3D khổng lồ ---
-            setTimeout(() => {
-                formSphere();
-                // Chuyển dòng chảy của các hạt sao thành dòng chảy vũ trụ bao quanh quả cầu
-                currentPhase = 'SPHERE_FLOW';
-                initSphereFlowParticles();
-            }, 16000);
-
-            // --- GIÂY 18.5: Hiện tên và nút bấm thư tay kính mờ ---
-            setTimeout(() => {
-                document.getElementById('main-name').style.opacity = '1';
-                document.getElementById('btn-open-letter').style.opacity = '1';
-                document.getElementById('mainScene').classList.add('interactive');
-            }, 18500);
-        }
-
-        // ----------------------------------------------------
-        // DÒNG CHẢY HẠT VŨ TRỤ BAO QUANH QUẢ CẦU (SPHERE FLOW PHYSICS)
-        // ----------------------------------------------------
-        function initSphereFlowParticles() {
-            particles.forEach(p => {
-                p.hasTarget = false;
-                // Tạo quỹ đạo xoay tròn quanh tâm màn hình
-                p.angle = Math.random() * Math.PI * 2;
-                p.radius = Math.random() * 200 + 220; // Bán kính bao quanh quả cầu 3D
-                p.angularSpeed = (Math.random() * 0.015 + 0.005) * (Math.random() > 0.5 ? 1 : -1);
-            });
-        }
-
-        function updateSphereFlowParticles() {
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-
-            particles.forEach(p => {
-                p.angle += p.angularSpeed;
-                const targetX = centerX + Math.cos(p.angle) * p.radius;
-                const targetY = centerY + Math.sin(p.angle) * p.radius * 0.4; // Tạo hình dải dẹt elip như vành đai sao Thổ
-
-                p.x += (targetX - p.x) * 0.05;
-                p.y += (targetY - p.y) * 0.05;
-            });
         }
 
         // ----------------------------------------------------
@@ -742,7 +645,7 @@
         // 2. Gom hội tụ toàn bộ ảnh thành khối cầu xoay 3D to đẹp
         function formSphere() {
             const isMobile = window.innerWidth <= 600;
-            // Bán kính lớn phối hợp với kích thước ảnh phóng to không bị đè nhau
+            // TĂNG BÁN KÍNH ĐỂ HOÀ HỢP VỚI KÍCH THƯỚC ẢNH ĐÃ TĂNG (Không bị dính chùm)
             const radius = isMobile ? 190 : 300; 
             const total = photos.length;
             
@@ -778,7 +681,7 @@
         }
 
         // ----------------------------------------------------
-        // HỆ THỐNG KÉO THẢ TƯƠNG TÁC ĐA CHẠM SIÊU MƯỢT TRÊN ẢNH
+        // HỆ THỐNG KÉO THẢ TƯƠNG TÁC ĐA CHẠM SIÊU MƯỢT
         // ----------------------------------------------------
         let activeDragItem = null;
         let startPointerX, startPointerY;
@@ -825,7 +728,7 @@
             activeDragItem.dataset.dragY = currentDragY;
             
             const origTransform = activeDragItem.dataset.origTransform || '';
-            // Nâng ảnh lên cao hơn (Z-axis = 180px) khi kéo tạo chiều sâu nổi 3D cực mạnh
+            // Nâng ảnh lên cao hơn (Z-axis = 180px) khi kéo tạo chiều sâu cực xịn
             activeDragItem.style.transform = `${origTransform} translate3d(${currentDragX}px, ${currentDragY}px, 180px) scale(1.25)`;
         }
 
@@ -837,6 +740,60 @@
             activeDragItem.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 2s';
             
             activeDragItem = null;
+        }
+
+        // ----------------------------------------------------
+        // KỊCH BẢN ĐIỆN ẢNH CHUYỂN PHÂN CẢNH TỪNG CHƯƠNG
+        // ----------------------------------------------------
+        function startCinemaMagic() {
+            // Khởi chạy nhạc nền
+            document.getElementById('bgMusic').play().catch(() => console.log("Yêu cầu duyệt tương tác trước"));
+
+            const startScreen = document.getElementById('start-screen');
+            const text1 = document.getElementById('text-1');
+            const text2 = document.getElementById('text-2');
+
+            // Đợi hạt nổ tỏa ra rực rỡ (1.2s) rồi mới dẹp hẳn màn hình chờ
+            setTimeout(() => {
+                startScreen.style.opacity = '0';
+                setTimeout(() => startScreen.style.display = 'none', 1500);
+            }, 1200);
+
+            // --- GIÂY 2.0: Xuất hiện lời dẫn 1 ---
+            setTimeout(() => {
+                text1.classList.add('active');
+            }, 2000);
+
+            // --- GIÂY 5.0: Nhòe mờ lời dẫn 1 ---
+            setTimeout(() => {
+                text1.classList.add('disperse');
+            }, 5000);
+
+            // --- GIÂY 6.2: Xuất hiện lời chúc 1/6 mộng mơ ---
+            setTimeout(() => {
+                text2.classList.add('active');
+            }, 6200);
+
+            // --- GIÂY 9.5: Nhòe mờ lời chúc ---
+            setTimeout(() => {
+                text2.classList.add('disperse');
+            }, 9500);
+
+            // --- GIÂY 11.2: Bung tỏa ảnh lộng lẫy bay bổng ---
+            setTimeout(() => {
+                scatterPhotos();
+            }, 11200);
+
+            // --- GIÂY 15.2: Gom xếp thành quả cầu 3D khổng lồ xoay tròn ---
+            setTimeout(() => {
+                formSphere();
+            }, 15200);
+
+            // --- GIÂY 17.8: Hiện tên và nút mở thư tay ấm áp ---
+            setTimeout(() => {
+                document.getElementById('main-name').style.opacity = '1';
+                document.getElementById('btn-open-letter').style.opacity = '1';
+            }, 17800);
         }
 
         // ----------------------------------------------------
