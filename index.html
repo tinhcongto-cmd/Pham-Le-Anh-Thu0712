@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quà 1/6 Cho Em Bé Phạm Lê Anh Thư 💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050014;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        /* Bầu trời sao */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(29,0,46,1) 0%, rgba(5,0,20,1) 100%);
+            z-index: 1;
+        }
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: blink 2s infinite ease-in-out;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; box-shadow: 0 0 5px #fff; }
+        }
+
+        /* Màn hình chờ mở quà */
+        #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #050014;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: opacity 1s ease;
+        }
+        
+        #start-screen h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #ffb3d9;
+            text-shadow: 0 0 15px #ff1a8c;
+            text-align: center;
+        }
+
+        .btn-start {
+            background: linear-gradient(45deg, #ff1a8c, #9900ff);
+            border: none;
+            padding: 15px 40px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 26, 140, 0.6);
+            transition: transform 0.3s;
+        }
+        .btn-start:hover {
+            transform: scale(1.1);
+        }
+
+        /* Không gian quả cầu 3D */
+        .scene {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .sphere-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            transform-style: preserve-3d;
+            transition: transform 1s ease;
+        }
+
+        .photo-item {
+            position: absolute;
+            width: 90px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(255, 26, 140, 0.8), 0 0 30px rgba(153, 0, 255, 0.5);
+            transition: all 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+            backface-visibility: visible;
+        }
+
+        /* Tên nhân vật chính hiển thị sau khi gom quả cầu */
+        #main-name {
+            position: absolute;
+            bottom: 20%;
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 0 0 10px #ff1a8c, 0 0 20px #9900ff;
+            opacity: 0;
+            transition: opacity 2s ease;
+            z-index: 10;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* Nút mở thư */
+        #btn-open-letter {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: transparent;
+            border: 2px solid #ffb3d9;
+            color: #ffb3d9;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 2s ease, background 0.3s;
+            z-index: 10;
+        }
+        #btn-open-letter:hover {
+            background: #ffb3d9;
+            color: #050014;
+            box-shadow: 0 0 15px #ffb3d9;
+        }
+
+        /* Hộp thư nội dung */
+        #letter-modal {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 30px rgba(255, 26, 140, 0.4);
+            color: #fff;
+        }
+        #letter-modal.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .letter-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ffb3d9;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Audio - Đổi tên file nhạc tại đây -->
+    <audio id="bgMusic" src="nhac.mp3" loop></audio>
+
+    <!-- Màn hình chào -->
+    <div id="start-screen">
+        <h1>Gửi em bé của anh... ✨</h1>
+        <button class="btn-start" onclick="startMagic()">Nhấn vào đây để nhận quà 1/6 nhé</button>
+    </div>
+
+    <!-- Nền sao -->
+    <div class="stars" id="starsContainer"></div>
+
+    <!-- Quả cầu ảnh 3D -->
+    <div class="scene">
+        <div class="sphere-container" id="sphere">
+            <!-- 15 Ảnh (Cậu thay tên file anh1.jpg -> anh15.jpg tương ứng nhé) -->
+            <img src="anh1.jpg" class="photo-item" alt="anh">
+            <img src="anh2.jpg" class="photo-item" alt="anh">
+            <img src="anh3.jpg" class="photo-item" alt="anh">
+            <img src="anh4.jpg" class="photo-item" alt="anh">
+            <img src="anh5.jpg" class="photo-item" alt="anh">
+            <img src="anh6.jpg" class="photo-item" alt="anh">
+            <img src="anh7.jpg" class="photo-item" alt="anh">
+            <img src="anh8.jpg" class="photo-item" alt="anh">
+            <img src="anh9.jpg" class="photo-item" alt="anh">
+            <img src="anh10.jpg" class="photo-item" alt="anh">
+            <img src="anh11.jpg" class="photo-item" alt="anh">
+            <img src="anh12.jpg" class="photo-item" alt="anh">
+            <img src="anh13.jpg" class="photo-item" alt="anh">
+            <img src="anh14.jpg" class="photo-item" alt="anh">
+            <img src="anh15.jpg" class="photo-item" alt="anh">
+        </div>
+    </div>
+
+    <!-- Chữ và Nút hiển thị sau -->
+    <div id="main-name">Phạm Lê Anh Thư 💖</div>
+    <button id="btn-open-letter" onclick="toggleLetter(true)">Đọc thư của anh nhé 💌</button>
+
+    <!-- Thư tay -->
+    <div id="letter-modal">
+        <div class="letter-content">
+            Hôm nay 01-06-2025 Là ngày "Quốc tế thiếu nhi". <br><br>
+            Embee bé nhỏ của anh, anh chúc embee có một ngày vui vẻ, hạnh phúc và mãi là embee của anh, chúc cho đôi mình bên nhau thật bền lâu.<br><br>
+            Happy to you 1 day vui vẻ ạ ❤️<br>
+            <i style="font-size: 0.9rem; color: #ccc;">(lâu rồi không làm mong em tạm chấp nhận nhé ^^)</i>
+        </div>
+        <button class="close-btn" onclick="toggleLetter(false)">Đóng thư</button>
+    </div>
+
+    <script>
+        // Bầu trời sao ngẫu nhiên
+        const starsContainer = document.getElementById('starsContainer');
+        for (let i = 0; i < 120; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 100 + 'vh';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        const photos = document.querySelectorAll('.photo-item');
+        const sphere = document.getElementById('sphere');
+
+        // Giai đoạn 1: Ảnh bay hỗn loạn
+        function scatterPhotos() {
+            photos.forEach(photo => {
+                const randomX = (Math.random() * 100 - 50) * 10; 
+                const randomY = (Math.random() * 100 - 50) * 10;
+                const randomZ = (Math.random() * 60 - 30) * 10;
+                photo.style.transform = `translate3d(${randomX}px, ${randomY}px, ${randomZ}px) rotate(${(Math.random()*60 - 30)}deg)`;
+            });
+        }
+
+        // Giai đoạn 2: Gom thành quả cầu
+        function formSphere() {
+            const radius = 240; 
+            const total = photos.length;
+            
+            photos.forEach((photo, index) => {
+                const phi = Math.acos(-1 + (2 * index) / total);
+                const theta = Math.sqrt(total * Math.PI) * phi;
+
+                const x = radius * Math.sin(phi) * Math.cos(theta);
+                const y = radius * Math.sin(phi) * Math.sin(theta);
+                const z = radius * Math.cos(phi);
+
+                photo.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${theta * 180 / Math.PI}deg) rotateX(${90 - phi * 180 / Math.PI}deg)`;
+            });
+
+            // Hiệu ứng quả cầu xoay tròn
+            let angle = 0;
+            setInterval(() => {
+                angle += 0.3;
+                sphere.style.transform = `rotateY(${angle}deg) rotateX(${angle/3}deg)`;
+            }, 30);
+        }
+
+        function startMagic() {
+            // Tắt màn hình chờ
+            const startScreen = document.getElementById('start-screen');
+            startScreen.style.opacity = '0';
+            setTimeout(() => startScreen.style.display = 'none', 1000);
+            
+            // Bật nhạc
+            document.getElementById('bgMusic').play().catch(() => console.log("Lỗi tự động phát nhạc"));
+
+            // Tung ảnh lên không gian
+            scatterPhotos();
+
+            // Sau 4 giây thì gom thành quả cầu
+            setTimeout(() => {
+                formSphere();
+            }, 4000);
+
+            // Sau 6 giây (khi quả cầu gom xong) thì hiện tên và nút mở thư
+            setTimeout(() => {
+                document.getElementById('main-name').style.opacity = '1';
+                document.getElementById('btn-open-letter').style.opacity = '1';
+            }, 6000);
+        }
+
+        // Bật/tắt thư tay
+        function toggleLetter(show) {
+            const modal = document.getElementById('letter-modal');
+            if(show) {
+                modal.classList.add('show');
+            } else {
+                modal.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>
